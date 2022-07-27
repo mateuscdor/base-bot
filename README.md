@@ -1,5 +1,5 @@
 # Base-bot
-Um sofware adequado e multi-funcional para criação de chatbots em node.
+Um software adequado e multi-funcional para criação de chatbots em node.
 
 ## Recursos
 ### Suporta várias plataformas
