@@ -25,7 +25,6 @@ const srv = server.listen(PORT, async () => {
     });
 
     if (connect.status !== 200) {
-      console.log(connect);
       return logger.error(
         `erro ao construir bot. ${JSON.stringify(connect, "\n", 2)}`
       );
