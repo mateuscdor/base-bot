@@ -46,14 +46,18 @@ module.exports = async (req, res) => {
 
     Response.json(res, Response.result(200));
   } catch (e) {
-    logger.error(`Erro construir o bot. ${e.stack}`);
+    logger.error(`Erro construir o bot. ${JSON.stringify(e, "\n", 2)}`);
 
     return Response.json(
       res,
       Response.error(
         404,
         "BB007",
-        `Um erro ocorreu ao tentar construir o bot. ${e.stack}`
+        `Um erro ocorreu ao tentar construir o bot. ${JSON.stringify(
+          e,
+          "\n",
+          2
+        )}`
       )
     );
   }

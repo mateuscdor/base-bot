@@ -63,7 +63,7 @@ class Baileys {
             const status = lastDisconnect?.error?.output?.statusCode;
             if (status !== DisconnectReason.loggedOut) {
               resolve(await this.reconnect());
-            }
+            } else reject(update);
           }
 
           if (connection == "open") resolve();
