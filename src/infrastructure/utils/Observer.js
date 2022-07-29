@@ -36,6 +36,7 @@ class Observer {
    * @param { Number } index
    */
   notify(...args) {
+    //TODO: remover envio do observer
     this.observers.forEach((observer) => observer(observer, ...args));
   }
 }
