@@ -43,8 +43,9 @@ class Bot {
    * @param {Object} chat
    */
   addChat(chat = {}) {
-    this.chats[chat.id || chat.jid] = chat;
-    this.onChats.notify();
+    const id = chat.id || chat.jid;
+    this.chats[id] = chat;
+    this.onChats.notify(id, chat);
   }
 
   /**
@@ -54,7 +55,7 @@ class Bot {
    */
   setChat(id = "", chat = {}) {
     this.chats[id] = chat;
-    this.onChats.notify();
+    this.onChats.notify(id, chat);
   }
 
   /**
@@ -110,12 +111,12 @@ class Bot {
       const message = m?.messages[0];
       if (!message?.message) return;
 
-      const jid = message.key.remoteJid;
+      const id = message.key.remoteJid;
 
       if (!message.message.senderKeyDistributionMessage) return;
-      if (this.chats[jid]) return;
+      if (this.chats[id]) return;
 
-      this.setChat(jid, { jid });
+      this.setChat(id, { id });
     });
 
     // Removendo salas de bate-papo
@@ -174,14 +175,16 @@ class Bot {
    */
   async addMessage(message = {}, interval = 1000) {
     return new Promise((resolve, reject) => {
-      const msg = async (index, observer) => {
+      const msg = async (observer, index) => {
         try {
           if (index == this.messages.get().indexOf(observer)) {
             await this.await(interval);
             await this.send(message);
 
+            const i = this.messages.get().indexOf(observer);
             this.messages.remove(observer);
-            
+            this.messages.notify(i);
+
             resolve();
           }
         } catch (e) {

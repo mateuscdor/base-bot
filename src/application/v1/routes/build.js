@@ -20,8 +20,7 @@ module.exports = async (req, res) => {
 
     logger.info("Bot conectado!");
 
-    bot.onChats.add(() => {
-      const chats = bot.chats;
+    bot.onChats.add((observer, id, chat) => {
       // save chats
     });
 
