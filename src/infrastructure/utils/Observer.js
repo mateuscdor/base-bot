@@ -20,7 +20,6 @@ class Observer {
   remove(observer) {
     const index = this.observers.indexOf(observer);
     this.observers = this.observers.splice(index + 1, this.observers.length);
-    this.notify(index);
   }
 
   /**
@@ -36,8 +35,8 @@ class Observer {
    * * Notifica um ou todos observadores
    * @param { Number } index
    */
-  notify(index) {
-    this.observers.forEach((observer) => observer(index, observer));
+  notify(...args) {
+    this.observers.forEach((observer) => observer(observer, ...args));
   }
 }
 
