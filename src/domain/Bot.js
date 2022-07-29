@@ -8,6 +8,7 @@ class Bot {
     this.isConnected = false;
     this.commands = new Commands(`${__dirname}/../infrastructure/commands`);
     this.messages = new Observer();
+    this.onChats = new Observer();
     this.user = {};
     this.chats = {};
   }
@@ -39,6 +40,45 @@ class Bot {
   }
 
   /**
+   * * Adiciona uma nova sala de bate-papo
+   * @param {Object} chat
+   */
+  addChat(chat = {}) {
+    this.chats[chat.id || chat.jid] = chat;
+    this.onChats.notify();
+  }
+
+  /**
+   * * Definir uma sala de bate-papo
+   * @param {String} id
+   * @param {Object} chat
+   */
+  setChat(id = "", chat = {}) {
+    this.chats[id] = chat;
+    this.onChats.notify();
+  }
+
+  /**
+   * * Remove uma sala de bate-papo
+   * @param {String} id
+   */
+  removeChat(id = "") {
+    delete this.chats[id];
+    this.onChats.notify();
+  }
+
+  /**
+   * * Retorna uma ou todas salas de bate-papo
+   * @param {*} id
+   * @param {*} isArray
+   * @returns
+   */
+  getChats(id = "") {
+    if (!!id) return this.chats[id];
+    else return this.chats || {};
+  }
+
+  /**
    * * Construir bot
    * @param {String} authPath
    * @param {Object} config
@@ -52,8 +92,38 @@ class Bot {
     // Definindo status de conexão
     this.plataform.on("connection.update", async (update) => {
       if (update.connection === "close") {
+        this.isConnected = true;
+      } else if (update.connection === "close") {
         this.isConnected = false;
       }
+    });
+
+    // Definindo novas salas de bate-papo
+    this.on("chats.upsert", (chats) => {
+      chats.map(async (chat) => {
+        this.addChat(chat);
+      });
+    });
+
+    // Definindo salas de bate-papo
+    this.on("messages.upsert", async (m) => {
+      const message = m?.messages[0];
+      if (!message?.message) return;
+
+      const jid = message.key.remoteJid;
+
+      if (!message.message.senderKeyDistributionMessage) return;
+      if (this.chats[jid]) return;
+
+      this.setChat(jid, { jid });
+    });
+
+    // Removendo salas de bate-papo
+    this.on("group-participants.update", (update) => {
+      if (update.action != "remove") return;
+      if (!update.participants.includes(this.user.id)) return;
+
+      this.removeChat(update.id);
     });
   }
 

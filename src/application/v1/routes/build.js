@@ -20,27 +20,14 @@ module.exports = async (req, res) => {
 
     logger.info("Bot conectado!");
 
+    bot.onChats.add(() => {
+      const chats = bot.chats;
+      // save chats
+    });
+
     bot.on("connection.update", async (update) => {
       events.connectionUpdate(bot, update);
     });
-
-    bot.on("groups.update", (groupMetadata) =>
-      events.groupUpdate(bot, groupMetadata)
-    );
-
-    bot.on("group-participants.update", (participants) =>
-      events.groupParticipantsUpdate(bot, participants)
-    );
-
-    bot.on("groups.upsert", (groupsMetadata) =>
-      events.groupsUpsert(bot, groupsMetadata)
-    );
-
-    bot.on("chats.set", (chats, isLatest) =>
-      events.chatsSet(bot, chats, isLatest)
-    );
-
-    bot.on("chats.upsert", (chats) => events.chatsUpsert(bot, chats));
 
     bot.on("messages.upsert", async (m) => events.messageUpsert(bot, m));
 
