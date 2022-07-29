@@ -31,12 +31,11 @@ class Bot {
 
   /**
    * * Definir usuário
-   * @param {String} id
+   * @param {Object} user
    */
-  setUser(id = "") {
-    //! Se modificar o usuario do Socket a conexão é derrubada
-    //TODO Fazer um sistema mais limpo
-    this.user = { id: String(id).replace(/:(.*)@/, "@") };
+  setUser(user = {}) {
+    const id = user.id.replace(/:(.*)@/, "@");
+    this.user = { ...user, id };
   }
 
   /**
@@ -87,12 +86,13 @@ class Bot {
     await this.plataform.connect(authPath, config);
     this.on = this.plataform.on;
     this.isConnected = true;
-    this.setUser(this.plataform.sock.user.id);
+    this.setUser(this.plataform.sock.user);
 
     // Definindo status de conexão
     this.plataform.on("connection.update", async (update) => {
       if (update.connection === "close") {
         this.isConnected = true;
+        this.setUser(this.plataform.sock.user);
       } else if (update.connection === "close") {
         this.isConnected = false;
       }
