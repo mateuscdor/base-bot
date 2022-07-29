@@ -1,33 +1,32 @@
 const logger = require("../../../infrastructure/config/logger");
 const Message = require("../../../domain/Message");
-const chatsUpsert = require("./chatsUpsert");
 
 module.exports = async (bot, m = {}) => {
   try {
+    // Verificando se a mensagem é válida
     if (!m?.messages) return;
     if (m.messages.length <= 0) return;
 
     const msg = m.messages[0];
 
+    // Verificando se é uma mensagem real e se não foi enviada pelo bot
     if (!msg.message) return;
     if (msg.key?.remoteJid == "status@broadcast") return;
     if (msg.key.fromMe) return;
 
+    // Marcar mensagem como visualizada
     await bot.readMessages([msg.key]);
 
+    // Verificar se não é uma mensagem antiga
     if (m.type !== "notify") return;
 
     const jid = msg.key.remoteJid;
 
-    if (msg.message.senderKeyDistributionMessage) {
-      await chatsUpsert(bot, [{ [jid.includes("@g") ? "id" : "jid"]: jid }]);
-      delete msg.message.senderKeyDistributionMessage;
-    }
+    // Removendo dados da mensagem
+    delete msg.message.senderKeyDistributionMessage;
+    delete msg.message.messageContextInfo;
 
-    if (msg.message.messageContextInfo) {
-      delete msg.message.messageContextInfo;
-    }
-
+    // Lendo mensagem
     const type = Object.keys(msg.message)[0];
     const message = msg.message[type] || {};
     const text =
@@ -37,6 +36,7 @@ module.exports = async (bot, m = {}) => {
 
     logger.info(`nova mensagem em: ${jid}`);
 
+    // Verificando se a mensagem é um comando
     await bot.commands.getCommand(type)?.execute(bot, msg);
 
     const command = bot.commands.getCommand(text.split(":")[0]);
@@ -44,6 +44,7 @@ module.exports = async (bot, m = {}) => {
     if (!command) return;
 
     try {
+      // Verificando se usuário tem permissão de enviar a mensagem
       if (command.permission.includes("owner")) {
         const owners = ["5515998585090@s.whatsapp.net"]; // admins
 
@@ -59,6 +60,7 @@ module.exports = async (bot, m = {}) => {
         }
       } else if (command.permission.includes("bot")) return;
 
+      // Executando o comando
       command.execute(bot, msg);
     } catch (e) {
       logger.error(`erro ao executar comando. ${e.stack}`);
