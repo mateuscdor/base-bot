@@ -164,8 +164,6 @@ class Bot {
     const m = await this.plataform.sendMessage(message);
 
     logger.info(`Mensagem enviada para: ${m.key.remoteJid}`);
-
-    return m;
   }
 
   /**
@@ -180,10 +178,10 @@ class Bot {
         try {
           if (index == this.messages.get().indexOf(observer)) {
             await this.await(interval);
-
             await this.send(message);
 
             this.messages.remove(observer);
+            
             resolve();
           }
         } catch (e) {

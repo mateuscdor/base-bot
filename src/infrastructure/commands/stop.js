@@ -7,7 +7,7 @@ async function execute(bot, message) {
       new Message(message.key.remoteJid, "Desligando bot...")
     );
 
-    //? Espera 5 segundos  dar um tempo da mensagem ser enviada
+    //? Espera 5 segundos para dar um tempo da mensagem ser enviada
     await bot.await(5000);
 
     await bot.plataform.stop();
