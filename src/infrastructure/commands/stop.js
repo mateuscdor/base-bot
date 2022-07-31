@@ -8,7 +8,7 @@ async function execute(bot, message) {
     );
 
     //? Espera 5 segundos para dar um tempo da mensagem ser enviada
-    await bot.await(5000);
+    await bot.sleep(5000);
 
     await bot.plataform.stop();
   } catch (e) {
