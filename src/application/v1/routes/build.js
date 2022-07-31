@@ -3,6 +3,7 @@ require("dotenv/config");
 const Response = require("../../../infrastructure/utils/Response");
 const events = require("../events");
 const logger = require("../../../infrastructure/config/logger");
+const Message = require("../../../domain/Message");
 
 module.exports = async (req, res) => {
   try {
@@ -20,8 +21,12 @@ module.exports = async (req, res) => {
 
     logger.info("Bot conectado!");
 
-    bot.onChats.add((observer, id, chat) => {
-      // save chats
+    bot.onChats.add(async (observer, id, chat, action) => {
+      if (action === "remove") {
+        // chat removed
+      } else if (action === "add") {
+        // chat added
+      }
     });
 
     bot.on("connection.update", async (update) => {

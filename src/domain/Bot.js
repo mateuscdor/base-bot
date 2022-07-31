@@ -1,6 +1,8 @@
 const Commands = require("../infrastructure/utils/Commands");
 const Observer = require("../infrastructure/utils/Observer");
 const logger = require("../infrastructure/config/logger");
+const Message = require("./Message");
+const calculeTime = require("../infrastructure/utils/calculeTime");
 
 class Bot {
   constructor(Plataform) {
@@ -9,6 +11,7 @@ class Bot {
     this.commands = new Commands(`${__dirname}/../infrastructure/commands`);
     this.messages = new Observer();
     this.onChats = new Observer();
+    this.automated = {};
     this.user = {};
     this.chats = {};
   }
@@ -45,7 +48,7 @@ class Bot {
   addChat(chat = {}) {
     const id = chat.id || chat.jid;
     this.chats[id] = chat;
-    this.onChats.notify(id, chat);
+    this.onChats.notify(id, chat, "add");
   }
 
   /**
@@ -55,7 +58,7 @@ class Bot {
    */
   setChat(id = "", chat = {}) {
     this.chats[id] = chat;
-    this.onChats.notify(id, chat);
+    this.onChats.notify(id, chat, "add");
   }
 
   /**
@@ -63,8 +66,9 @@ class Bot {
    * @param {String} id
    */
   removeChat(id = "") {
+    const chat = this.chats[id];
     delete this.chats[id];
-    this.onChats.notify();
+    this.onChats.notify(id, chat, "remove");
   }
 
   /**
@@ -178,7 +182,7 @@ class Bot {
       const msg = async (observer, index) => {
         try {
           if (index == this.messages.get().indexOf(observer)) {
-            await this.await(interval);
+            await this.sleep(interval);
             await this.send(message);
 
             const i = this.messages.get().indexOf(observer);
@@ -209,7 +213,7 @@ class Bot {
    * @returns
    */
   async sendMessage(message = {}, interval = 1000, time = 1000) {
-    await this.await(time);
+    await this.sleep(time);
     await this.plataform.setStatus("sending", message.chat);
     return await this.addMessage(message, interval);
   }
@@ -219,8 +223,76 @@ class Bot {
    * @param {Number} timeout
    * @returns
    */
-  async await(timeout = 1000) {
+  async sleep(timeout = 1000) {
     return new Promise((resolve) => setTimeout(resolve, timeout));
+  }
+
+  /**
+   * * Automotiza uma mensagem
+   * @param {Object} message
+   * @param {Function} sendMessageCallback
+   * @param {Function} calback
+   */
+  async addAutomate(
+    message = {},
+    sendMessageCallback = async () => {},
+    calback = async () => {}
+  ) {
+    const now = Date.now();
+    const date = new Date(now);
+
+    // Configurando mensagem automatica
+    if (!message.id) message.id = now;
+    if (!message.updatedAt) message.updatedAt = now;
+    if (!message.interval) message.interval = 1000;
+    if (!message.hours) message.hours = date.getHours();
+    if (!message.minutes) message.minutes = date.getMinutes() + 1;
+    if (!message.lastDay) message.lastDay = date.getDate() - 2;
+
+    const { id, minutes, hours, lastDay, interval, updatedAt, image, text } =
+      message;
+
+    // Converter e aguardar o tempo em milesegundos
+    const time = calculeTime(lastDay, hours, minutes);
+    await this.sleep(time);
+
+    // Criar e atualizar dados da mensagem automatizada
+    this.automated[id] = {
+      ...(this.automated[id] || {}),
+      ...message,
+    };
+
+    // Define as salas de bate-papo da mensagem se não houver uma
+    if (!this.automated[id].chats) {
+      this.automated[id].chats =
+        this.automated[id].chat || Object.keys(this.chats);
+    }
+
+    await Promise.all(
+      this.automated[id].chats.map(async (chatId) => {
+        if (this.automated[id].updatedAt !== updatedAt) return;
+        if (!chatId) return;
+
+        // Criar mensagem
+        const msg = new Message(chatId, text);
+        if (!!image) msg.image = image;
+
+        // Enviar mensagem e desativar sala de bate-papo
+        await this.sendMessage(msg, interval);
+
+        const nowChats = this.automated[id].chats;
+        const index = nowChats.indexOf(this.automated[id].chats[chatId]);
+        this.automated[id].chats = nowChats.splice(index + 1, nowChats.length);
+
+        await sendMessageCallback(this.automated[id]);
+      })
+    );
+
+    this.automated[id].lastDay = new Date(Date.now()).getDate();
+    this.automated[id].updatedAt = Date.now();
+
+    await calback(this.automated[id]);
+    this.addAutomate(this.automated[id]);
   }
 }
 
