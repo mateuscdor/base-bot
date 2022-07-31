@@ -104,7 +104,11 @@ class Baileys {
       return this.sock.sendMessage(message, ctx, options);
     }
 
-    const { chat, msg, context } = this.refactoryMessage(message);
+    let { chat, msg, context } = this.refactoryMessage(message);
+
+    chat = chat.replace("@gus", "@g.us");
+    chat = chat.replace("@swhatsappnet", "@s.whatsapp.net");
+
     return this.sock.sendMessage(chat, msg, context);
   }
 

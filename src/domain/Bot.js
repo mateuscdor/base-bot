@@ -215,7 +215,7 @@ class Bot {
   async sendMessage(message = {}, interval = 1000, time = 1000) {
     await this.sleep(time);
     await this.plataform.setStatus("sending", message.chat);
-    return await this.addMessage(message, interval);
+    return this.addMessage(message, interval);
   }
 
   /**
@@ -231,12 +231,12 @@ class Bot {
    * * Automotiza uma mensagem
    * @param {Object} message
    * @param {Function} sendMessageCallback
-   * @param {Function} calback
+   * @param {Function} callback
    */
   async addAutomate(
     message = {},
     sendMessageCallback = async () => {},
-    calback = async () => {}
+    callback = async () => {}
   ) {
     const now = Date.now();
     const date = new Date(now);
@@ -252,15 +252,17 @@ class Bot {
     const { id, minutes, hours, lastDay, interval, updatedAt, image, text } =
       message;
 
-    // Converter e aguardar o tempo em milesegundos
-    const time = calculeTime(lastDay, hours, minutes);
-    await this.sleep(time);
+    if (updatedAt == this.automated[id]?.updatedAt) return;
 
     // Criar e atualizar dados da mensagem automatizada
     this.automated[id] = {
       ...(this.automated[id] || {}),
       ...message,
     };
+
+    // Converter e aguardar o tempo em milesegundos
+    const time = calculeTime(lastDay, hours, minutes);
+    await this.sleep(time);
 
     // Define as salas de bate-papo da mensagem se não houver uma
     if (!this.automated[id].chats) {
@@ -277,22 +279,21 @@ class Bot {
         const msg = new Message(chatId, text);
         if (!!image) msg.image = image;
 
-        // Enviar mensagem e desativar sala de bate-papo
+        // Enviar mensagem
         await this.sendMessage(msg, interval);
 
+        // Remover sala de bate-papo da mensagem
         const nowChats = this.automated[id].chats;
         const index = nowChats.indexOf(this.automated[id].chats[chatId]);
         this.automated[id].chats = nowChats.splice(index + 1, nowChats.length);
 
+        // Notificar envio da mensagem
         await sendMessageCallback(this.automated[id]);
       })
     );
 
-    this.automated[id].lastDay = new Date(Date.now()).getDate();
-    this.automated[id].updatedAt = Date.now();
-
-    await calback(this.automated[id]);
-    this.addAutomate(this.automated[id]);
+    // Notificar envio de todas as mensagem
+    await callback(this.automated[id]);
   }
 }
 
