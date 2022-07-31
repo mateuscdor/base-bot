@@ -11,3 +11,5 @@ Telegram (Em breve)
 ### Servidor
 É possível se conectar ao bot atrávez de um servidor.
 Tambem é possível enviar mensagens por ele.
+### Automatização de mensagem
+Automatiza mensagens para serem enviadas em um determinado horário do dia.
