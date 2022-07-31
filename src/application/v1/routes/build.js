@@ -3,8 +3,6 @@ require("dotenv/config");
 const Response = require("../../../infrastructure/utils/Response");
 const events = require("../events");
 const logger = require("../../../infrastructure/config/logger");
-const Message = require("../../../domain/Message");
-
 module.exports = async (req, res) => {
   try {
     const { bot, body } = req;
