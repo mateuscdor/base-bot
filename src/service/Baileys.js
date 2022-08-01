@@ -17,6 +17,7 @@ class Baileys {
       auth: null,
     };
     this.isConnected = false;
+    this.events = [];
 
     // Injetando funções do Baileys
     this.makeWASocket = makeWASocket;
@@ -49,10 +50,9 @@ class Baileys {
         this.groupAcceptInvite = this.sock.groupAcceptInvite;
         this.onWhatsApp = this.sock.onWhatsApp;
         this.readMessages = this.sock.readMessages;
-        this.on = this.sock.ev.on;
 
         // Verificando se bot conectou
-        this.on("connection.update", async (update) => {
+        this.sock.ev.on("connection.update", async (update) => {
           const { connection, lastDisconnect, qr } = update;
 
           if (qr) {
@@ -66,7 +66,10 @@ class Baileys {
             } else reject(update);
           }
 
-          if (connection == "open") resolve();
+          if (connection == "open") {
+            this.onAllEvents();
+            resolve();
+          }
         });
       } catch (e) {
         reject(e);
@@ -154,6 +157,36 @@ class Baileys {
     if (mention) context.quoted = mention;
 
     return { chat, msg, context };
+  }
+
+  /**
+   * * Adiciona um novo evento a lista de eventos
+   * @param {String} eventName
+   * @param {Function} event
+   * @returns
+   */
+  addEvent(eventName = "", event = () => {}) {
+    this.events.push[{ eventName, event }]
+  }
+
+  /**
+   * @param {String} eventName
+   * @param {Function} event
+   * @returns
+   */
+  on(eventName = "", event = () => {}) {
+    this.addEvent(eventName, event)
+    this.sock.ev.on(eventName, event);
+  }
+
+  /**
+   * @param {Array} events
+   * @returns
+   */
+  onAllEvents(events = this.events) {
+    this.events.forEach(ev => {
+      this.sock.ev.on(ev.eventName, ev.event)
+    })
   }
 }
 
