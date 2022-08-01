@@ -166,27 +166,27 @@ class Baileys {
    * @returns
    */
   addEvent(eventName = "", event = () => {}) {
-    this.events.push[{ eventName, event }]
+    this.events.push[{ eventName, event }];
   }
 
   /**
-   * @param {String} eventName
+   * * @param {String} eventName
    * @param {Function} event
    * @returns
    */
   on(eventName = "", event = () => {}) {
-    this.addEvent(eventName, event)
+    this.addEvent(eventName, event);
     this.sock.ev.on(eventName, event);
   }
 
   /**
-   * @param {Array} events
+   * * @param {Array} events
    * @returns
    */
   onAllEvents(events = this.events) {
-    this.events.forEach(ev => {
-      this.sock.ev.on(ev.eventName, ev.event)
-    })
+    this.events.forEach((ev) => {
+      this.sock.ev.on(ev.eventName, ev.event);
+    });
   }
 }
 
