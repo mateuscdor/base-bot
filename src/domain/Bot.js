@@ -89,7 +89,6 @@ class Bot {
    */
   async build(authPath, config) {
     await this.plataform.connect(authPath, config);
-    this.on = this.plataform.on;
     this.isConnected = true;
     this.setUser(this.plataform.sock.user);
 
@@ -130,6 +129,10 @@ class Bot {
 
       this.removeChat(update.id);
     });
+  }
+
+  on(eventName = "", event = () => {}) {
+    this.plataform.on(eventName, event);
   }
 
   /**
