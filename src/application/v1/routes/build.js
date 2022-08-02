@@ -17,8 +17,6 @@ module.exports = async (req, res) => {
 
     await bot.build(`${__dirname}/../../../../auth_info_baileys`);
 
-    logger.info("Bot conectado!");
-
     bot.onChats.add(async (observer, id, chat, action) => {
       if (action === "remove") {
         // chat removed
@@ -35,18 +33,14 @@ module.exports = async (req, res) => {
 
     Response.json(res, Response.result(200));
   } catch (e) {
-    logger.error(`Erro construir o bot. ${JSON.stringify(e, "\n", 2)}`);
+    logger.error(`Erro construir o bot. ${e}`);
 
     return Response.json(
       res,
       Response.error(
         404,
         "BB007",
-        `Um erro ocorreu ao tentar construir o bot. ${JSON.stringify(
-          e,
-          "\n",
-          2
-        )}`
+        `Um erro ocorreu ao tentar construir o bot. ${e}`
       )
     );
   }
