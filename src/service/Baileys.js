@@ -68,6 +68,7 @@ class Baileys {
 
           if (connection == "open") {
             this.onAllEvents();
+            logger.info("Bot conectado!");
             resolve();
           }
         });
@@ -160,17 +161,18 @@ class Baileys {
   }
 
   /**
-   * * Adiciona um novo evento a lista de eventos
+   * * Salva um evento na lista de eventos
    * @param {String} eventName
    * @param {Function} event
    * @returns
    */
   addEvent(eventName = "", event = () => {}) {
-    this.events.push[{ eventName, event }];
+    this.events.push({ eventName, event });
   }
 
   /**
-   * * @param {String} eventName
+   * * Salva e adiciona um evento
+   * @param {String} eventName
    * @param {Function} event
    * @returns
    */
@@ -180,11 +182,12 @@ class Baileys {
   }
 
   /**
-   * * @param {Array} events
+   * * Carrega todos os eventos salvos
+   * @param {Array} events
    * @returns
    */
   onAllEvents(events = this.events) {
-    this.events.forEach((ev) => {
+    events.forEach((ev) => {
       this.sock.ev.on(ev.eventName, ev.event);
     });
   }
