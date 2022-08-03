@@ -2,7 +2,7 @@ const isBase64 = require("is-base64");
 
 class Message {
   /**
-   * CRia uma mensagem
+   * * Cria uma mensagem
    * @param {String} chat
    * @param {String} text
    * @param {Message} mention
