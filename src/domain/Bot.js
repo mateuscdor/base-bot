@@ -93,7 +93,7 @@ class Bot {
     this.setUser(this.plataform.sock.user);
 
     // Definindo status de conexão
-    this.plataform.on("connection.update", async (update) => {
+    this.plataform.on("connection", async (update) => {
       if (update.connection === "close") {
         this.isConnected = true;
         this.setUser(this.plataform.sock.user);
@@ -103,14 +103,14 @@ class Bot {
     });
 
     // Definindo novas salas de bate-papo
-    this.on("chats.upsert", (chats) => {
+    this.on("chats", (chats) => {
       chats.map(async (chat) => {
         this.addChat(chat);
       });
     });
 
     // Definindo salas de bate-papo
-    this.on("messages.upsert", async (m) => {
+    this.on("messages", async (m) => {
       const message = m?.messages[0];
       if (!message?.message) return;
 
@@ -123,7 +123,7 @@ class Bot {
     });
 
     // Removendo salas de bate-papo
-    this.on("group-participants.update", (update) => {
+    this.on("groups-update", (update) => {
       if (update.action != "remove") return;
       if (!update.participants.includes(this.user.id)) return;
 

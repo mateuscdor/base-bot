@@ -178,7 +178,44 @@ class Baileys {
    */
   on(eventName = "", event = () => {}) {
     this.addEvent(eventName, event);
-    this.sock.ev.on(eventName, event);
+    this.addOn({ eventName, event });
+  }
+
+  /**
+   * * Adiciona um evento
+   * @param {Object} ev
+   */
+  addOn(ev = {}) {
+    if (!!!ev.eventName) return;
+
+    switch (ev.eventName) {
+      case "connection":
+        ev.eventName = "connection.update";
+        break;
+      case "messages":
+        ev.eventName = "messages.upsert";
+        break;
+      case "groups-update":
+        ev.eventName = "groups.update";
+        break;
+      case "groups":
+        ev.eventName = "groups.upsert";
+        break;
+      case "members":
+        ev.eventName = "group-participants.update";
+        break;
+      case "chats":
+        ev.eventName = "chats.upsert";
+        break;
+      case "chats-update":
+        ev.eventName = "chats.update";
+        break;
+      default:
+        ev.eventName = ev.eventName;
+        break;
+    }
+
+    this.sock.ev.on(ev.eventName, ev.event);
   }
 
   /**

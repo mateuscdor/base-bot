@@ -25,11 +25,11 @@ module.exports = async (req, res) => {
       }
     });
 
-    bot.on("connection.update", async (update) => {
-      events.connectionUpdate(bot, update);
+    bot.on("connection", async (update) => {
+      events.connection(bot, update);
     });
 
-    bot.on("messages.upsert", async (m) => events.messageUpsert(bot, m));
+    bot.on("messages", async (m) => events.messages(bot, m));
 
     Response.json(res, Response.result(200));
   } catch (e) {
