@@ -19,11 +19,9 @@ module.exports = async (bot, update) => {
           logger.error(`Conexao fechada devido ao erro: ${err}`);
         }
 
-        if (status == bot.plataform.DisconnectReason.loggedOut) {
-          logger.warn("Bot desligado.");
-        } else if (bot.isConnected) {
-          logger.warn("Reconectando...");
-        }
+        if (status == bot.plataform.DisconnectReason.loggedOut) return;
+
+        logger.warn("Bot desligado.");
       }
     } catch (e) {
       logger.error(`Erro ao atualizar conexão. ${e.stack}`);

@@ -60,7 +60,11 @@ class Baileys {
           }
 
           if (connection == "close") {
-            const status = lastDisconnect?.error?.output?.statusCode;
+            const status =
+              lastDisconnect?.error?.output?.statusCode ||
+              lastDisconnect?.error ||
+              500;
+              
             if (status !== DisconnectReason.loggedOut) {
               resolve(await this.reconnect());
             } else reject(update);
@@ -84,6 +88,7 @@ class Baileys {
    * @returns
    */
   async reconnect(config = this.config) {
+    logger.warn("Reconectando...");
     return await this.connect(this.authPath, config);
   }
 
