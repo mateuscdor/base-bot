@@ -25,11 +25,24 @@ module.exports = async (req, res) => {
       }
     });
 
-    bot.on("connection", async (update) => {
-      events.connection(bot, update);
-    });
+    // Definindo evento de conexão
+    //? Chamado sempre que a conexão do bot é atualizada (connected, disconnected, etc...)
+    bot.on("connection", async (update) => events.connection(bot, update));
 
+    // Definindo evento para novas salas de bate-papo
+    bot.on("chats", async (chats) => events.chats(bot, chats));
+
+    // Definindo evento para novas mensagens
     bot.on("messages", async (m) => events.messages(bot, m));
+
+    // Definindo evento para novos grupos
+    bot.on("groups", async (groups) => events.groups(bot, groups));
+
+    // Definindo evento para atualização de grupos
+    bot.on("groupsUpdate", async (update) => events.groupsUpdate(bot, update));
+
+    // Definindo evento para novos membros
+    bot.on("members", async (members) => events.members(bot, members));
 
     Response.json(res, Response.result(200));
   } catch (e) {
