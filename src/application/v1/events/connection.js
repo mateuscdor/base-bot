@@ -3,7 +3,13 @@ const logger = require("../../../infrastructure/config/logger");
 module.exports = async (bot, update) => {
   return await new Promise(async (resolve, reject) => {
     try {
-      const { connection, lastDisconnect } = update;
+      /*
+        connection: close || open || connecting
+        lastDisconnect: { error }
+        qr: new qr code for conection
+        isNewLogin: new bot
+      */
+      const { connection, lastDisconnect, qr, isNewConnection } = update;
 
       if (connection === "close") {
         const status =
