@@ -1,9 +1,9 @@
-const messages = require("./messageUpsert");
-const connection = require("./connectionUpdate");
-const groupsUpdate = require("./groupUpdate");
-const groups = require("./groupsUpsert");
-const members = require("./groupParticipantsUpdate");
-const chats = require("./chatsUpsert");
+const chats = require("./chats");
+const groups = require("./groups");
+const groupsUpdate = require("./groupsUpdate");
+const members = require("./members");
+const messages = require("./messages");
+const connection = require("./connection");
 
 module.exports = {
   messages,
