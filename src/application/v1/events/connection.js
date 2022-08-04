@@ -3,7 +3,13 @@ const logger = require("../../../infrastructure/config/logger");
 module.exports = async (bot, update) => {
   return await new Promise(async (resolve, reject) => {
     try {
-      const { connection, lastDisconnect } = update;
+      /*
+        connection: close || open || connecting
+        lastDisconnect: { error }
+        qr: new qr code for conection
+        isNewLogin: new bot
+      */
+      const { connection, lastDisconnect, qr, isNewConnection } = update;
 
       if (connection === "close") {
         const status =
@@ -19,11 +25,9 @@ module.exports = async (bot, update) => {
           logger.error(`Conexao fechada devido ao erro: ${err}`);
         }
 
-        if (status == bot.plataform.DisconnectReason.loggedOut) {
-          logger.warn("Bot desligado.");
-        } else if (bot.isConnected) {
-          logger.warn("Reconectando...");
-        }
+        if (status == bot.plataform.DisconnectReason.loggedOut) return;
+
+        logger.warn("Bot desligado.");
       }
     } catch (e) {
       logger.error(`Erro ao atualizar conexão. ${e.stack}`);
