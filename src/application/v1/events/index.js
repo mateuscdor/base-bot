@@ -1,19 +1,15 @@
-const credsUpdate = require("./credsUpdate");
-const messageUpsert = require("./messageUpsert");
-const connectionUpdate = require("./connectionUpdate");
-const groupUpdate = require("./groupUpdate");
-const groupsUpsert = require("./groupsUpsert");
-const groupParticipantsUpdate = require("./groupParticipantsUpdate");
-const chatsSet = require("./chatsSet");
-const chatsUpsert = require("./chatsUpsert");
+const chats = require("./chats");
+const groups = require("./groups");
+const groupsUpdate = require("./groupsUpdate");
+const members = require("./members");
+const messages = require("./messages");
+const connection = require("./connection");
 
 module.exports = {
-  messageUpsert,
-  connectionUpdate,
-  credsUpdate,
-  groupUpdate,
-  groupsUpsert,
-  groupParticipantsUpdate,
-  chatsSet,
-  chatsUpsert,
+  messages,
+  connection,
+  groupsUpdate,
+  groups,
+  members,
+  chats,
 };
