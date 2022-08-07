@@ -12,7 +12,7 @@ module.exports = async (bot, m = {}) => {
     // Verificando se é uma mensagem real e se não foi enviada pelo bot
     if (!msg.message) return;
     if (msg.key?.remoteJid == "status@broadcast") return;
-    if (msg.key.fromMe) return;
+    // if (msg.key.fromMe) return;
 
     // Marcar mensagem como visualizada
     await bot.readMessages([msg.key]);
