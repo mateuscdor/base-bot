@@ -17,6 +17,7 @@ module.exports = async (req, res) => {
 
     await bot.build(`${__dirname}/../../../../auth_info_baileys`);
 
+    //TODO: remove observer
     bot.onChats.add(async (observer, id, chat, action) => {
       if (action === "remove") {
         // chat removed
