@@ -182,15 +182,16 @@ class Bot {
    */
   async addMessage(message = {}, interval = 1000) {
     return new Promise((resolve, reject) => {
-      const msg = async (observer, index) => {
+      const msg = {};
+
+      msg.message = async (index) => {
         try {
-          if (index == this.messages.get().indexOf(observer)) {
+          if (index == this.messages.get().indexOf(msg.message)) {
             await this.sleep(interval);
             await this.send(message);
 
-            const i = this.messages.get().indexOf(observer);
-            this.messages.remove(observer);
-            this.messages.notify(i);
+            this.messages.remove(msg.message);
+            this.messages.notify(index);
 
             resolve();
           }
@@ -199,9 +200,9 @@ class Bot {
         }
       };
 
-      this.messages.add(msg);
+      const m = this.messages.add(msg.message);
 
-      const messageIndex = this.messages.get().indexOf(msg);
+      const messageIndex = this.messages.get().indexOf(m);
       if (messageIndex === 0) {
         this.messages.notify(messageIndex);
       }
