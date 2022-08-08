@@ -1,7 +1,7 @@
 const Message = require("../../domain/Message");
 
 async function execute(bot, message) {
-  await bot.sendMessage(new Message(message.key.remoteJid, "Hello there!"));
+  await bot.sendMessage(new Message(message.key.remoteJid, "Hello there!", message));
 }
 
 module.exports = {

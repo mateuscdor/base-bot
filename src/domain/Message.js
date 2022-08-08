@@ -1,16 +1,19 @@
 const isBase64 = require("is-base64");
+const ValidMessage = require("./ValidMessage");
 
-class Message {
+class Message extends ValidMessage {
   /**
    * * Cria uma mensagem
    * @param {String} chat
    * @param {String} text
    * @param {Message} mention
+   * @param {Buffer} image
+   * @param {Buffer} video
+   * @param {Number} time
+   *
    */
-  constructor(chat, text, mention) {
-    this.chat = chat;
-    this.text = text;
-    this.mention = mention;
+  constructor(chat, text, mention, image, video, time) {
+    super("text", chat, text, mention, image, video, time);
   }
 
   /**
@@ -51,7 +54,7 @@ class Message {
   setImage(image) {
     if (this.video) delete this.video;
 
-    if (isBase64(image)) image = this.getBufferToBase64(image);
+    if (!isBase64(image)) image = Buffer.from(image).toString("base64");
 
     this.image = image;
     return this;
@@ -65,19 +68,12 @@ class Message {
   setVideo(video) {
     if (this.image) delete this.image;
 
-    if (isBase64(video)) video = this.getBufferToBase64(video);
+    if (!isBase64(video)) {
+      video = Buffer.from(video).toString("base64");
+    }
 
     this.video = video;
     return this;
-  }
-
-  /**
-   * * Retorna o buffer de um buffer base64
-   * @param {Buffer} buffer
-   * @returns
-   */
-  getBufferToBase64(buffer) {
-    return Buffer.from(buffer, "base64");
   }
 }
 
