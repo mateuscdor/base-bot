@@ -9,16 +9,12 @@ module.exports = async (req, res) => {
     const { plataform } = body;
 
     if (plataform !== "whatsapp") {
-      return Response.json(
-        res,
-        Response.error(404, "BB003", "Plataforma indisponível.")
-      );
+      return Response.json(res, Response.error(404, "BB003", "Plataforma indisponível."));
     }
 
     await bot.build(`${__dirname}/../../../../auth_info_baileys`);
 
-    //TODO: remove observer
-    bot.onChats.add(async (observer, id, chat, action) => {
+    bot.onChats.add(async (id, chat, action) => {
       if (action === "remove") {
         // chat removed
       } else if (action === "add") {
@@ -51,11 +47,7 @@ module.exports = async (req, res) => {
 
     return Response.json(
       res,
-      Response.error(
-        404,
-        "BB007",
-        `Um erro ocorreu ao tentar construir o bot. ${e}`
-      )
+      Response.error(404, "BB007", `Um erro ocorreu ao tentar construir o bot. ${e}`)
     );
   }
 };
