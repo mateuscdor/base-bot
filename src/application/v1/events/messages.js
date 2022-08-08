@@ -12,7 +12,7 @@ module.exports = async (bot, m = {}) => {
     // Verificando se é uma mensagem real e se não foi enviada pelo bot
     if (!msg.message) return;
     if (msg.key?.remoteJid == "status@broadcast") return;
-    if (msg.key.fromMe) return;
+    // if (msg.key.fromMe) return;
 
     // Marcar mensagem como visualizada
     await bot.readMessages([msg.key]);
@@ -29,8 +29,7 @@ module.exports = async (bot, m = {}) => {
     // Lendo mensagem
     const type = Object.keys(msg.message)[0];
     const message = msg.message[type] || {};
-    const text =
-      type == "conversation" ? message : message.text || message.caption;
+    const text = type == "conversation" ? message : message.text || message.caption;
 
     if (!text) return;
 
@@ -46,16 +45,13 @@ module.exports = async (bot, m = {}) => {
     try {
       // Verificando se usuário tem permissão de enviar a mensagem
       if (command.permission.includes("owner")) {
-        const owners = ["5515998585090@s.whatsapp.net"]; // admins
-
-        const user = msg.participant || msg.key.participant || jid;
+        // admins
+        const owners = ["15484805741@s.whatsapp.net"];
+        const user = msg.participant || msg.key.participant;
 
         if (!owners.includes(user)) {
           return await bot.sendMessage(
-            new Message(
-              jid,
-              "Você não tem permissão para executar esse comando!"
-            ).setMention(msg)
+            new Message(jid, "Você não tem permissão para executar esse comando!", msg)
           );
         }
       } else if (command.permission.includes("bot")) return;
@@ -64,12 +60,7 @@ module.exports = async (bot, m = {}) => {
       command.execute(bot, msg);
     } catch (e) {
       logger.error(`erro ao executar comando. ${e.stack}`);
-      await bot.sendMessage(
-        new Message(
-          jid,
-          "Erro executar comando. Favor tentar novamente"
-        ).setMention(msg)
-      );
+      await bot.sendMessage(new Message(jid, "Erro executar comando. Favor tentar novamente", msg));
     }
   } catch (e) {
     logger.error(`erro ao processar a mensagem. ${e.stack}`);

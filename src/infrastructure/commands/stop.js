@@ -3,22 +3,17 @@ const logger = require("../config/logger");
 
 async function execute(bot, message) {
   try {
-    await bot.sendMessage(
-      new Message(message.key.remoteJid, "Desligando bot...")
-    );
+    await bot.sendMessage(new Message(message.key.remoteJid, "Desligando bot...", message));
 
     //? Espera 5 segundos para dar um tempo da mensagem ser enviada
     await bot.sleep(5000);
 
     await bot.plataform.stop();
   } catch (e) {
-    logger.error(`erro ao desligar bot. ${e}`);
+    logger.error(`erro ao desligar bot. ${e.stack}`);
 
     await bot.sendMessage(
-      new Message(
-        message.key.remoteJid,
-        "Erro ao desligar bot. Favor tentar novamente"
-      )
+      new Message(message.key.remoteJid, "Erro ao desligar bot. Favor tentar novamente", message)
     );
   }
 }

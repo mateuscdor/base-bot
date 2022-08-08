@@ -182,15 +182,16 @@ class Bot {
    */
   async addMessage(message = {}, interval = 1000) {
     return new Promise((resolve, reject) => {
-      const msg = async (observer, index) => {
+      const msg = {};
+
+      msg.message = async (index) => {
         try {
-          if (index == this.messages.get().indexOf(observer)) {
+          if (index == this.messages.get().indexOf(msg.message)) {
             await this.sleep(interval);
             await this.send(message);
 
-            const i = this.messages.get().indexOf(observer);
-            this.messages.remove(observer);
-            this.messages.notify(i);
+            this.messages.remove(msg.message);
+            this.messages.notify(index);
 
             resolve();
           }
@@ -199,9 +200,9 @@ class Bot {
         }
       };
 
-      this.messages.add(msg);
+      const m = this.messages.add(msg.message);
 
-      const messageIndex = this.messages.get().indexOf(msg);
+      const messageIndex = this.messages.get().indexOf(m);
       if (messageIndex === 0) {
         this.messages.notify(messageIndex);
       }
@@ -215,9 +216,8 @@ class Bot {
    * @param {Number} time
    * @returns
    */
-  async sendMessage(message = {}, interval = 1000, time = 1000) {
-    await this.sleep(time);
-    await this.plataform.setStatus("sending", message.chat);
+  async sendMessage(message = {}, interval = 1000) {
+    await this.sleep(message.time);
     return this.addMessage(message, interval);
   }
 
@@ -236,11 +236,7 @@ class Bot {
    * @param {Function} sendMessageCallback
    * @param {Function} callback
    */
-  async addAutomate(
-    message = {},
-    sendMessageCallback = async () => {},
-    callback = async () => {}
-  ) {
+  async addAutomate(message = {}, sendMessageCallback = async () => {}, callback = async () => {}) {
     const now = Date.now();
     const date = new Date(now);
 
@@ -252,8 +248,7 @@ class Bot {
     if (!message.minutes) message.minutes = date.getMinutes() + 1;
     if (!message.lastDay) message.lastDay = date.getDate() - 2;
 
-    const { id, minutes, hours, lastDay, interval, updatedAt, image, text } =
-      message;
+    const { id, minutes, hours, lastDay, interval, updatedAt, image, text } = message;
 
     if (updatedAt == this.automated[id]?.updatedAt) return;
 
@@ -269,8 +264,7 @@ class Bot {
 
     // Define as salas de bate-papo da mensagem se não houver uma
     if (!this.automated[id].chats) {
-      this.automated[id].chats =
-        this.automated[id].chat || Object.keys(this.chats);
+      this.automated[id].chats = this.automated[id].chat || Object.keys(this.chats);
     }
 
     await Promise.all(

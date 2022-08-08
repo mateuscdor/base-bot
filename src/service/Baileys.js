@@ -61,10 +61,8 @@ class Baileys {
 
           if (connection == "close") {
             const status =
-              lastDisconnect?.error?.output?.statusCode ||
-              lastDisconnect?.error ||
-              500;
-              
+              lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error || 500;
+
             if (status !== DisconnectReason.loggedOut) {
               resolve(await this.reconnect());
             } else reject(update);
@@ -109,14 +107,12 @@ class Baileys {
    * @returns
    */
   async sendMessage(message = {}, ctx = {}, options = {}) {
+    //? Se mensagem está escrita na forma da API Baileys
     if (typeof message === "string") {
       return this.sock.sendMessage(message, ctx, options);
     }
 
-    let { chat, msg, context } = this.refactoryMessage(message);
-
-    chat = chat.replace("@gus", "@g.us");
-    chat = chat.replace("@swhatsappnet", "@s.whatsapp.net");
+    const { chat, msg, context } = this.refactoryMessage(message);
 
     return this.sock.sendMessage(chat, msg, context);
   }
@@ -148,9 +144,10 @@ class Baileys {
   refactoryMessage(message = {}) {
     if (typeof message === "string") message = { text: message };
 
-    if (message.buttons) return message;
+    const { type, chat, text, image, video, mention } = message;
 
-    const { chat, text, image, video, mention } = message;
+    if (type !== "text") return message;
+
     const msg = {};
     const context = {};
 
