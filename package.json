@@ -5,13 +5,11 @@
   "main": "app.js",
   "scripts": {
     "build": "set NODE_ENV=production && npm ci",
-    "dev": "set NODE_ENV=development && nodemon app.js",
-    "staging": "set NODE_ENV=production && nodemon app.js --prod",
-    "prod": "set NODE_ENV=production && nodemon app.js --prod",
-    "dev:linux": "export NODE_ENV=development && nodemon -L app.js",
+    "dev": "set NODE_ENV=development && tsc app.js",
+    "prod": "set NODE_ENV=production && tsc app.js --prod",
     "build:linux": "export NODE_ENV=production && npm ci",
-    "staging:linux": "export NODE_ENV=production && nodemon -L app.js --prod",
-    "prod:linux": "export NODE_ENV=production && nodemon -L app.js --prod"
+    "dev:linux": "export NODE_ENV=development && tsc -L app.js",
+    "prod:linux": "export NODE_ENV=production && tsc -L app.js --prod"
   },
   "keywords": [
     "bot",
@@ -20,18 +18,25 @@
   "author": "laxeder",
   "license": "MIT",
   "dependencies": {
-    "@adiwajshing/baileys": "4.3.0",
-    "graceful": "1.0.2",
+    "@adiwajshing/baileys": "4.4.0",
+    "@types/graceful-fs": "4.1.5",
     "axios": "0.27.2",
     "body-parser": "1.20.0",
     "cors": "2.8.5",
-    "dotenv": "16.0.1",
     "express": "4.18.1",
+    "graceful": "1.0.2",
     "is-base64": "1.1.0",
-    "nodemon": "2.0.19",
     "nonce": "1.0.4",
     "pino": "8.1.0",
     "pino-pretty": "8.1.0",
-    "qrcode-terminal": "0.12.0"
+    "qrcode-terminal": "0.12.0",
+    "rxjs": "7.5.6"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.12",
+    "@types/express": "4.17.13",
+    "@types/node": "18.7.14",
+    "nodemon": "2.0.19",
+    "typescript": "4.8.2"
   }
 }
