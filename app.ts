@@ -1,4 +1,5 @@
 // Importando dependencias
+import dotenv from "dotenv";
 import axios from "axios";
 
 // Importando servidor e logger
@@ -6,12 +7,13 @@ import server from "./src/service/server";
 import logger from "./src/infrastructure/config/logger";
 
 // Variaveis de ambiente
+dotenv.config();
 const NODE_ENV = process.env.NODE_ENV?.trim();
 const PORT = NODE_ENV == "production" ? process.env.PORT : process.env.DEV_PORT;
 const HOST = NODE_ENV == "production" ? process.env.HOST : process.env.DEV_HOST;
 
 // Inicializando servidor
-server.listen(PORT, async () => {
+const srv = server.listen(PORT, async () => {
   try {
     logger.info(`Servidor subido na porta: ${PORT}`);
 
@@ -25,5 +27,6 @@ server.listen(PORT, async () => {
     }
   } catch (err: any) {
     logger.error(`Erro ao iniciar servidor. ${err?.response?.data?.message || err?.stack}`);
+    srv.close();
   }
 });

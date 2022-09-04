@@ -1,7 +1,7 @@
 // Importando dependencias
-import express from "express";
+import * as bodyParser from "body-parser";
+import express from 'express'
 import cors from "cors";
-import bodyParser from "body-parser";
 
 // iImportando rotas
 import routes from "../application/v1/routes/routes";

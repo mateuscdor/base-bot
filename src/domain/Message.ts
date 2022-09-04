@@ -1,86 +1,66 @@
-const isBase64 = require("is-base64");
-const ValidMessage = require("./ValidMessage");
-import BaseMessage from "../infrastructure/utils/BaseMessage";
+import BaseMessage from "../infrastructure/bot/BaseMessage";
+import Chat from "../infrastructure/bot/Chat";
 
-export default class Message extends ValidMessage implements BaseMessage {
-  public chat: string;
+export default class Message implements BaseMessage {
+  public chat: Chat;
   public text: string;
-  /**
-   * * Cria uma mensagem
-   * @param {String} chat
-   * @param {String} text
-   * @param {Message} mention
-   * @param {Buffer} image
-   * @param {Buffer} video
-   * @param {Number} time
-   *
-   */
-  constructor(chat: string, text: string, image: Buffer, video: Buffer, mention: any, time: number) {
-    super("text", chat, text, mention, image, video, time);
+  public mention: any;
+  public isOld: boolean;
 
+  constructor(chat: Chat, text: string, mention?: any, isOld: boolean = false) {
     this.text = text;
     this.chat = chat;
+    this.mention = mention;
+    this.isOld = isOld;
   }
 
   /**
    * * Define a sala de bate-papo
-   * @param {String} chat
-   * @returns
+   * @param chat
    */
-  setChat(chat = "") {
+  setChat(chat: Chat) {
     this.chat = chat;
-    return this;
   }
 
   /**
    * * Define o texto da mensagem
-   * @param {*} text
+   * @param text
    * @returns
    */
-  setText(text = "") {
+  setText(text: string) {
     this.text = text;
-    return this;
   }
 
   /**
    * * Menciona uma mensagem
-   * @param {Message} mention
+   * @param mention
    * @returns
    */
   setMention(mention: any) {
     this.mention = mention;
-    return this;
   }
 
   /**
-   * * Define uma imagem para a mensagem
-   * @param {Buffer} image
+   * * Obter a sala de bate-papo da mensagem
    * @returns
    */
-  setImage(image: string) {
-    if (this.video) delete this.video;
-
-    if (!isBase64(image)) image = Buffer.from(image).toString("base64");
-
-    this.image = image;
-    return this;
+  getChat(): Chat {
+    return this.chat;
   }
 
   /**
-   * * Define um vídeo para a mensagem
-   * @param {Buffer} image
+   * * Obter o texto da mensagem
    * @returns
    */
-  setVideo(video: string) {
-    if (this.image) delete this.image;
+  getText(): string {
+    return this.text;
+  }
 
-    if (!isBase64(video)) {
-      video = Buffer.from(video).toString("base64");
-    }
-
-    this.video = video;
-    return this;
+  /**
+   * * Obter a menção da mensagemf
+   * @returns
+   */
+  getMention(): any {
+    return this.mention;
   }
 }
-
-module.exports = Message;
