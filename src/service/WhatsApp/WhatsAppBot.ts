@@ -9,22 +9,26 @@ import makeWASocket, {
   ConnectionState,
   WAMessage,
   MessageUpsertType,
+  WASocket,
+  WAPresence,
+  makeInMemoryStore,
 } from "@adiwajshing/baileys";
 
 import { loggerConfig } from "../../infrastructure/config/logger";
 import BaseBot from "../../infrastructure/bot/BaseBot";
-import convertMessage from "./ConvertMessageBaileys";
+import convertMessage from "./ConvertMessageWhatsApp";
 import Status from "../../infrastructure/bot/Status";
-import BaileysMessage from "./BaileysMessage";
+import WhatsAppMessage from "./WhatsAppMessage";
 import Message from "../../domain/Message";
 
-export default class BaileysBot extends BaseBot {
+export default class WhatsAppBot extends BaseBot {
   private _auth: string = "";
-  private _bot: any = {};
-
+  private _bot?: WASocket;
+  
   public DisconnectReason = DisconnectReason;
   public config: UserFacingSocketConfig;
   public bot: any = {};
+  public store?: any;
 
   public statusOpts: any = {
     typing: "composing",
@@ -64,17 +68,20 @@ export default class BaileysBot extends BaseBot {
         this._bot = makeWASocket({ ...this.config, auth: state });
         this._bot.ev.on("creds.update", saveCreds);
 
+        this.store = makeInMemoryStore({});
+        this.store.bind(this._bot.ev);
+
         this._bot.ev.on("messages.upsert", (m: { messages: WAMessage[]; type: MessageUpsertType }) => {
           if (m.messages.length <= 0) return;
 
           const message: WAMessage = m.messages[m.messages.length - 1];
           const msg = convertMessage(message, m.type);
-          
+
           this.events.messages.next(msg);
         });
 
         // Verificando se bot conectou
-        this._bot.ev.on("connection.update", async (update: ConnectionState) => {
+        this._bot.ev.on("connection.update", async (update: Partial<ConnectionState>) => {
           const status = (update.lastDisconnect?.error as Boom)?.output?.statusCode || update.lastDisconnect?.error || 500;
 
           this.events.connection.next({ action: update.connection, status, login: update?.qr });
@@ -83,8 +90,8 @@ export default class BaileysBot extends BaseBot {
             this.status.setStatus("online");
 
             // Removendo caracteres do ID do bot
-            const id = this._bot.user.id.replace(/:(.*)@/, "@");
-            this.bot = { ...this._bot.user, id };
+            this.bot.user = { ...this._bot?.user };
+            this.bot.user.id = this.bot.user.id?.replace(/:(.*)@/, "@") || "";
 
             resolve(true);
           }
@@ -119,8 +126,10 @@ export default class BaileysBot extends BaseBot {
    * @param reason
    * @returns
    */
-  public stop(reason?: DisconnectReason): Promise<any> {
-    return this._bot.end(reason || DisconnectReason.loggedOut);
+  public stop(reason?: Error): Promise<any> {
+    return new Promise(() => {
+      this._bot?.end(reason);
+    });
   }
 
   /**
@@ -130,12 +139,22 @@ export default class BaileysBot extends BaseBot {
    */
   public async send(content: Message | Status): Promise<any> {
     if (content instanceof Message) {
-      const { chat, message, context } = new BaileysMessage(content);
+      const waMSG = new WhatsAppMessage(this, content);
+      await waMSG.refactory();
+
+      const { chat, message, context, relay } = waMSG;
+
+      if (relay == true) return this._bot?.relayMessage(chat, message, {});
+
       return this._bot?.sendMessage(chat, message, context);
     }
 
     if (content instanceof Status) {
-      const status: string = this.statusOpts[content.status];
+      if (content.status === "reading") {
+        return this._bot?.readMessages([{ remoteJid: content.chat?.id, id: content.chat?.chatID, participant: content.chat?.member }]);
+      }
+
+      const status: WAPresence = this.statusOpts[content.status];
       return this._bot?.sendPresenceUpdate(status, content.chat?.id);
     }
   }
@@ -156,22 +175,29 @@ export default class BaileysBot extends BaseBot {
    * * Verifica se o número está registrado no WhatsApp
    * @returns
    */
-  public onWhatsApp(id: Array<string> | string): any {
-    return this._bot.onWhatsApp(id);
+  public async onExists(id: string): Promise<{ exists: boolean; id: string }> {
+    const user = await this._bot?.onWhatsApp(id);
+
+    if (user && user.length > 0) return { exists: user[0].exists, id: user[0].jid };
+
+    return { exists: false, id };
   }
 
-  // TODO
-  public updateMediaMessage(): any {
-    return this._bot.updateMediaMessage(...arguments);
+  /**
+   * * Atualiza uma mensagem de mídia
+   * @param message
+   * @returns
+   */
+  public updateMediaMessage(message: proto.IWebMessageInfo): Promise<proto.IWebMessageInfo> | undefined {
+    return this._bot?.updateMediaMessage(message);
   }
 
-  // TODO
-  public groupAcceptInvite(): any {
-    return this._bot.groupAcceptInvite(...arguments);
-  }
-
-  // TODO
-  public readMessages() {
-    return this._bot.readMessages(...arguments);
+  /**
+   * * Aceita o convite para um grupo
+   * @param code
+   * @returns
+   */
+  public groupAcceptInvite(code: string): Promise<string | undefined> | undefined {
+    return this._bot?.groupAcceptInvite(code);
   }
 }
