@@ -1,7 +1,7 @@
 import Bot from "../../../domain/Bot";
-import BaileysBot from "../../../service/Baileys/BaileysBot";
+import WhatsAppBot from "../../../service/WhatsApp/WhatsAppBot";
 
-var BOT = new Bot(new BaileysBot());
+var BOT = new Bot(new WhatsAppBot());
 
 export default (req: any, res: any, next: Function) => {
   req.bot = BOT;
