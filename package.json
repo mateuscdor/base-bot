@@ -2,16 +2,14 @@
   "name": "multi-bot",
   "version": "1.1.0",
   "description": "Um chatbot multi-plataforma em node",
-  "main": "app.js",
+  "main": "app.ts",
   "scripts": {
-    "build": "set NODE_ENV=production && npm ci",
-    "dev": "set NODE_ENV=development && nodemon app.js",
-    "staging": "set NODE_ENV=production && nodemon app.js --prod",
-    "prod": "set NODE_ENV=production && nodemon app.js --prod",
-    "dev:linux": "export NODE_ENV=development && nodemon -L app.js",
-    "build:linux": "export NODE_ENV=production && npm ci",
-    "staging:linux": "export NODE_ENV=production && nodemon -L app.js --prod",
-    "prod:linux": "export NODE_ENV=production && nodemon -L app.js --prod"
+    "build": "set NODE_ENV=production && npm ci && tsc",
+    "dev": "set NODE_ENV=development && nodemon app.ts",
+    "prod": "set NODE_ENV=production && nodemon app.ts --prod",
+    "build:linux": "export NODE_ENV=production && npm ci && tsc",
+    "dev:linux": "export NODE_ENV=development && nodemon -L app.ts",
+    "prod:linux": "export NODE_ENV=production && nodemon -L app.ts --prod"
   },
   "keywords": [
     "bot",
@@ -20,18 +18,33 @@
   "author": "laxeder",
   "license": "MIT",
   "dependencies": {
-    "@adiwajshing/baileys": "4.3.0",
-    "graceful": "1.0.2",
+    "@adiwajshing/baileys": "github:adiwajshing/baileys",
+    "@adiwajshing/keyed-db": "0.2.4",
+    "@hapi/boom": "10.0.0",
+    "@types/graceful-fs": "4.1.5",
     "axios": "0.27.2",
     "body-parser": "1.20.0",
     "cors": "2.8.5",
-    "dotenv": "16.0.1",
+    "dotenv": "16.0.2",
     "express": "4.18.1",
+    "graceful": "1.0.2",
     "is-base64": "1.1.0",
-    "nodemon": "2.0.19",
     "nonce": "1.0.4",
     "pino": "8.1.0",
     "pino-pretty": "8.1.0",
-    "qrcode-terminal": "0.12.0"
+    "qrcode-terminal": "0.12.0",
+    "rxjs": "7.5.6",
+    "uuidv4": "6.2.13",
+    "ws": "8.8.1"
+  },
+  "devDependencies": {
+    "@types/cors": "2.8.12",
+    "@types/express": "4.17.13",
+    "@types/is-base64": "1.1.1",
+    "@types/node": "18.7.14",
+    "@types/ws": "8.5.3",
+    "nodemon": "2.0.19",
+    "ts-node-dev": "2.0.0",
+    "typescript": "4.8.2"
   }
 }
