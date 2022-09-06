@@ -2,16 +2,16 @@ import BaseMessage from "../infrastructure/bot/BaseMessage";
 import Chat from "../infrastructure/bot/Chat";
 
 export default class Message implements BaseMessage {
-  public chat: Chat;
+  public isOld?: boolean;
+  public mention?: any;
   public text: string;
-  public mention: any;
-  public isOld: boolean;
+  public chat: Chat;
 
-  constructor(chat: Chat, text: string, mention?: any, isOld: boolean = false) {
+  constructor(chat: Chat, text: string, mention?: any, isOld?: boolean) {
     this.text = text;
     this.chat = chat;
-    this.mention = mention;
-    this.isOld = isOld;
+    if (mention) this.mention = mention;
+    if (isOld) this.isOld = isOld;
   }
 
   /**

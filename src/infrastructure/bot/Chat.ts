@@ -3,29 +3,41 @@ export interface Chats {
 }
 
 export default class Chat {
+  public members: string[] | Array<string> = [];
+  public fromMe?: boolean;
+  public member?: string;
+  public chatID?: string;
+  public isNew?: boolean;
+  public name?: string;
   public id: string;
-  public name: string;
-  public isNew: boolean;
 
-  constructor(id: string, name?: string, isNew: boolean = false) {
+  constructor(id: string, name?: string, isNew?: boolean) {
     this.id = id;
-    this.name = name || "";
-    this.isNew = isNew;
+    if (name) this.name = name;
+    if (isNew) this.isNew = isNew;
   }
 
-  setId(id: string) {
+  public setId(id: string) {
     this.id = id;
   }
 
-  setName(name: string) {
+  public setName(name: string) {
     this.name = name;
   }
 
-  getId(): string {
+  public setMember(member: string) {
+    this.member = member;
+  }
+
+  public setMembers(members: string[] | Array<string>) {
+    this.members = members;
+  }
+
+  public getId(): string {
     return this.id;
   }
 
-  getName(): string {
+  public getName(): string | undefined {
     return this.name;
   }
 }

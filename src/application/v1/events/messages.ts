@@ -2,10 +2,12 @@ import logger from "../../../infrastructure/config/logger";
 import Status from "../../../infrastructure/bot/Status";
 import Message from "../../../domain/Message";
 import Bot from "../../../domain/Bot";
+import ButtonMessage from "../../../infrastructure/bot/ButtonMessage";
+import ListMessage from "../../../domain/ListMessage";
 
 export default async (bot: Bot, message: Message) => {
   try {
-    console.log("new message:", message);
+    if (message.chat.fromMe) return;
 
     // Marcar mensagem como visualizada
     await bot.send(new Status("reading", message.chat));

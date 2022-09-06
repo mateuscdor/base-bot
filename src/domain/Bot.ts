@@ -1,4 +1,4 @@
-import { Observable, Subscriber } from "rxjs";
+import { Observable, Subject, Subscriber } from "rxjs";
 import { uuid } from "uuidv4";
 
 import Chat, { Chats } from "../infrastructure/bot/Chat";
@@ -9,7 +9,7 @@ import Commands from "./Commands";
 import Message from "./Message";
 
 export default class Bot {
-  private _awaitSendMessages: { observable: Observable<any>; observer?: Subscriber<any> };
+  private _awaitSendMessages: Subject<any> = new Subject();
   private _awaitSendMessagesCount: number = 0;
   private _autoMessages: any = {};
   private _plataform: BaseBot;
@@ -19,10 +19,6 @@ export default class Bot {
   constructor(plataform: BaseBot, commands: Commands = new Commands()) {
     this._plataform = plataform;
     this.commands = commands;
-
-    this._awaitSendMessages = {
-      observable: new Observable((sub: Subscriber<any>) => (this._awaitSendMessages.observer = sub)),
-    };
   }
 
   /**
@@ -107,15 +103,18 @@ export default class Bot {
    * @param interval
    * @returns
    */
-  public async addMessage(message: Message, interval: number = 1000): Promise<any> {
+  public addMessage(message: Message, interval: number = 1000): Promise<any> {
     return new Promise((resolve, reject) => {
-      const observer = this._awaitSendMessages.observable.subscribe(async () => {
+      const observer = this._awaitSendMessages.subscribe(async (obs) => {
         try {
-          await this.sleep(interval);
-          await this.send(message);
+          if (obs !== observer) return;
 
           observer.unsubscribe();
-          this._awaitSendMessagesCount = this._awaitSendMessagesCount - 1;
+
+          await this.sleep(interval);
+          await this._plataform.send(message);
+
+          this._awaitSendMessagesCount -= 1;
 
           resolve(null);
         } catch (err) {
@@ -123,10 +122,11 @@ export default class Bot {
         }
       });
 
-      if (this._awaitSendMessagesCount === 0) {
-        if (this._awaitSendMessages.observer) {
-          this._awaitSendMessages.observer.next();
-        }
+      
+      this._awaitSendMessagesCount += 1;
+
+      if (this._awaitSendMessagesCount <= 1) {
+        this._awaitSendMessages.next(observer);
       }
     });
   }
