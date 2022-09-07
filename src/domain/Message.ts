@@ -2,7 +2,7 @@ import BaseMessage from "../infrastructure/bot/BaseMessage";
 import Chat from "../infrastructure/bot/Chat";
 
 export default class Message implements BaseMessage {
-  private originalMention: any;
+  private _originalMention: any;
 
   public mentions: string[] = [];
   public mention?: Message;
@@ -148,8 +148,8 @@ export default class Message implements BaseMessage {
    * * Define uma menção não refactorada
    * @param originalMention
    */
-  public setOriginalMention(originalMention: string): void {
-    this.originalMention = originalMention;
+  public setOriginalMention(originalMention: any): void {
+    this._originalMention = originalMention;
   }
 
   /**
@@ -157,6 +157,6 @@ export default class Message implements BaseMessage {
    * @returns
    */
   public getOriginalMention(): any {
-    return this.originalMention;
+    return this._originalMention;
   }
 }
