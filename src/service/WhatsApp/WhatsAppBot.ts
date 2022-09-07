@@ -24,7 +24,7 @@ import Message from "../../domain/Message";
 export default class WhatsAppBot extends BaseBot {
   private _auth: string = "";
   private _bot?: WASocket;
-  
+
   public DisconnectReason = DisconnectReason;
   public config: UserFacingSocketConfig;
   public bot: any = {};
@@ -151,7 +151,7 @@ export default class WhatsAppBot extends BaseBot {
 
     if (content instanceof Status) {
       if (content.status === "reading") {
-        return this._bot?.readMessages([{ remoteJid: content.chat?.id, id: content.chat?.chatID, participant: content.chat?.member }]);
+        return this._bot?.readMessages([{ remoteJid: content.chat?.id, id: content.id }]);
       }
 
       const status: WAPresence = this.statusOpts[content.status];

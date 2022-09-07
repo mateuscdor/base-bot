@@ -2,6 +2,7 @@ import Chat from "./Chat";
 
 export default interface Message {
   chat: Chat;
+  id?: string;
   text: string;
-  mention?: any;
+  isOld?: boolean;
 }

@@ -11,6 +11,10 @@ export default async (bot: Bot, update: { action: string; status?: number; login
     if (update.action == "close") {
       // Reconexão não requerida
       if (update.status === DisconnectReason.restartRequired) return;
+      // Bot Desligado
+      if (update.status === DisconnectReason.loggedOut) {
+        return logger.warn("Bot desligado!");
+      }
 
       logger.error(`Conexão fechada devido ao erro: ${DisconnectReason[update.status || 500]}`);
     }

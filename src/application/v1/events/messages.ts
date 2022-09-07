@@ -2,19 +2,18 @@ import logger from "../../../infrastructure/config/logger";
 import Status from "../../../infrastructure/bot/Status";
 import Message from "../../../domain/Message";
 import Bot from "../../../domain/Bot";
-import ButtonMessage from "../../../infrastructure/bot/ButtonMessage";
-import ListMessage from "../../../domain/ListMessage";
 
 export default async (bot: Bot, message: Message) => {
   try {
-    if (message.chat.fromMe) return;
+    if (message.fromMe) return;
 
     // Marcar mensagem como visualizada
-    await bot.send(new Status("reading", message.chat));
+    await bot.send(new Status("reading", message.chat, message.id));
 
     logger.info(`Nova mensagem em: ${message.chat.id}`);
 
     const command = bot.commands.get(message.text.split(/\s+/)[0]);
+    
     if (!command) return;
 
     try {
