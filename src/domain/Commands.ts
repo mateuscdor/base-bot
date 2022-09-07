@@ -153,8 +153,8 @@ export default class Commands {
       if (fs.statSync(`${dir}/${file}`).isDirectory()) {
         commands = { ...commands, ...this.getCommands(`${dir}/${file}`) };
       } else {
-        const command = require(`${dir}/${file}`);
-        commands[command.name.toLowerCase().trim()] = command;
+        const command = require(`${dir}/${file}`)?.default;
+        if (command) commands[command.name.toLowerCase().trim()] = command;
       }
     });
 
