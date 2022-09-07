@@ -1,4 +1,4 @@
-import { getContentType, MessageUpsertType, proto, WAMessage, WAMessageContent, WAProto } from "@adiwajshing/baileys";
+import { getContentType, MessageUpsertType, proto, WAMessage, WAMessageContent } from "@adiwajshing/baileys";
 import ListMessage from "../../domain/ListMessage";
 import Message from "../../domain/Message";
 import ButtonMessage from "../../infrastructure/bot/ButtonMessage";
@@ -12,20 +12,21 @@ export const convertMessage = (message: WAMessage, type?: MessageUpsertType): Me
   if (!message.message) return msg;
   if (!message.key.remoteJid) return msg;
 
-  if (message.key.participant) msg.chat.setMember(message.key.participant);
+  if (message.key.participant) msg.setMember(message.key.participant);
   if (message.key.remoteJid) msg.chat.setId(message.key.remoteJid);
-  if (message.key.fromMe) msg.chat.fromMe = message.key.fromMe;
+  if (message.key.fromMe) msg.fromMe = message.key.fromMe;
   if (message.pushName) msg.chat.name = message.pushName;
-  if (message.key.id) msg.chat.chatID = message.key.id;
+  if (message.key.id) msg.id = message.key.id;
 
-  msg = convertContentMessage(message.message, msg);
+  msg = convertContentMessage(message.message, msg, message);
 
   return msg;
 };
 
-export const convertContentMessage = (messageContent: WAMessageContent, msg: Message): Message => {
-  const contentType = getContentType(messageContent);
+export const convertContentMessage = (messageContent: WAMessageContent, msg: Message, original?: any): Message => {
+  if (Object.keys(messageContent).includes("senderKeyDistributionMessage")) msg.chat.setIsNew(true);
 
+  const contentType = getContentType(messageContent);
   if (!contentType) return msg;
 
   let content: any = contentType === "conversation" ? { text: messageContent[contentType] } : messageContent[contentType];
@@ -34,12 +35,14 @@ export const convertContentMessage = (messageContent: WAMessageContent, msg: Mes
   if (contentType === "buttonsMessage" || contentType === "templateMessage") msg = convertButtonMessage(messageContent, msg);
   if (!!!msg.text) msg.setText(content.text || content.caption || content.buttonText || content.contentText || content.hydratedTemplate?.hydratedContentText || "");
 
-  if (content.contextInfo) msg = convertContextMessage(content.contextInfo, msg);
+  if (content.contextInfo) msg = convertContextMessage(content.contextInfo, msg, original);
 
   return msg;
 };
 
-export const convertContextMessage = (context: proto.ContextInfo, msg: Message): Message => {
+export const convertContextMessage = (context: proto.ContextInfo, msg: Message, original?: any): Message => {
+  if (context.mentionedJid) msg.setMentions(context.mentionedJid);
+
   if (context.quotedMessage) {
     const message = {
       key: {
@@ -50,9 +53,8 @@ export const convertContextMessage = (context: proto.ContextInfo, msg: Message):
       message: context.quotedMessage,
     };
 
-    if (context.mentionedJid) msg.chat.setMembers(context.mentionedJid);
-
     msg.setMention(convertMessage(message));
+    msg.setOriginalMention(message);
   }
 
   return msg;

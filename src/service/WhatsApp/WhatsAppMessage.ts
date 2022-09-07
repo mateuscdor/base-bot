@@ -1,4 +1,3 @@
-import { AnyMessageContent, makeInMemoryStore, proto, WASocket } from "@adiwajshing/baileys";
 import ListMessage from "../../domain/ListMessage";
 import Message from "../../domain/Message";
 import ButtonMessage from "../../infrastructure/bot/ButtonMessage";
@@ -26,7 +25,11 @@ export default class BaileysMessage {
     this.chat = message.chat.id;
     this.message = this.refactoryMessage(message);
 
-    if (message.mention) this.context.quoted = this._wa.store.messages[message.mention.chat.id]?.get(message.mention.chat.chatID);
+    if (message.mention) {
+      const original = message.getOriginalMention();
+      if (original) this.context.quoted = original;
+      else this.context.quoted = this._wa.store.messages[message.mention.chat.id]?.get(message.mention.id);
+    }
     if (message instanceof ButtonMessage) this.refactoryButtonMessage(message);
     if (message instanceof ListMessage) this.refactoryListMessage(message);
   }
@@ -36,9 +39,10 @@ export default class BaileysMessage {
 
     msg.text = message.text;
 
-    if (message.chat.member) msg.participant = message.chat.member;
-    if (message.chat.fromMe) msg.fromMe = message.chat.fromMe;
-    if (message.chat.chatID) msg.id = message.chat.chatID;
+    if (message.member) msg.participant = message.member;
+    if (message.fromMe) msg.fromMe = message.fromMe;
+    if (message.id) msg.id = message.id;
+    if (message.mentions) msg.mentions = message.mentions;
 
     return msg;
   }
@@ -67,6 +71,8 @@ export default class BaileysMessage {
       hydratedTemplate.hydratedButtons.push(btn);
     });
 
+    //? A API do WhatsApp está com problemas na mensagem de template
+    //! TODO: Arrumar sistema de mensagem template
     this.message = {
       viewOnceMessage: {
         message: {
@@ -83,10 +89,10 @@ export default class BaileysMessage {
    * @param message
    */
   public refactoryListMessage(message: ListMessage) {
-    this.message.footer = message.footer;
-    this.message.description = message.text;
-    this.message.title = message.title;
     this.message.buttonText = message.buttonText;
+    this.message.description = message.text;
+    this.message.footer = message.footer;
+    this.message.title = message.title;
     this.message.sections = [];
 
     message.list.map((list) => {

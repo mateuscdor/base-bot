@@ -43,7 +43,7 @@ export default class ButtonMessage extends Message {
    * @param index
    * @returns
    */
-  addUrl(text: string, url: string, index: number = this.buttons.length + 1): ButtonMessage {
+  public addUrl(text: string, url: string, index: number = this.buttons.length + 1): ButtonMessage {
     this.buttons.push({ index, url: { text, url } });
     return this;
   }
@@ -55,7 +55,7 @@ export default class ButtonMessage extends Message {
    * @param index
    * @returns
    */
-  addCall(text: string, phone: number, index: number = this.buttons.length + 1): ButtonMessage {
+  public addCall(text: string, phone: number, index: number = this.buttons.length + 1): ButtonMessage {
     this.buttons.push({ index, call: { text, phone } });
     return this;
   }
@@ -67,7 +67,7 @@ export default class ButtonMessage extends Message {
    * @param index
    * @returns
    */
-  addReply(text: string, id: string = this.generateID(), index: number = this.buttons.length + 1): ButtonMessage {
+  public addReply(text: string, id: string = this.generateID(), index: number = this.buttons.length + 1): ButtonMessage {
     this.buttons.push({ index, reply: { text, id } });
     return this;
   }
