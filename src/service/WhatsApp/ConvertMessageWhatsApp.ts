@@ -54,7 +54,7 @@ export const convertContextMessage = (context: proto.ContextInfo, msg: Message, 
     };
 
     msg.setMention(convertMessage(message));
-    msg.setOriginalMention(original);
+    msg.setOriginalMention(message);
   }
 
   return msg;
