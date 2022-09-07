@@ -1,8 +1,10 @@
-import { ReplaySubject, Subject } from "rxjs";
-import Message from "../../domain/Message";
-import Chat from "./Chat";
+import { Subject } from "rxjs";
 
-export let EventsName: "connection" | "messages" | "chats";
+export interface EventsName {
+  connection: string;
+  messages: string;
+  chats: string;
+}
 
 export default interface Events {
   messages: Subject<any>;
