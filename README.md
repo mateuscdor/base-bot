@@ -35,7 +35,7 @@ npm run prod
 ```
 
 ## WhatsApp
-Após iniciar o bot um QR Code será emprimido no terminal, escane-o com seu WhatsApp para gerar uma nova conexão entre seu múmero e o Bot. Essa conexão será guardada em ```./auth_info_baileys```, para gerar uma nova delete-o ou se conecte com um novo caminho de sessão.
+Após iniciar o bot um QR Code será emprimido no terminal, escane-o com seu WhatsApp para gerar uma nova conexão entre seu número e o Bot. Essa conexão será guardada em ```./auth_info_baileys```, para gerar uma nova delete-o ou se conecte com um novo caminho de sessão.
 ``` ts
 // src/application/v1/routes/build.ts
 
